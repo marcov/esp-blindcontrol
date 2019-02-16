@@ -48,16 +48,16 @@
         font-weight: bold;
       }
 
-      .small, .big {
+      .downBtn, .upBtn {
         height: 33vh;
       }
 
-      .small {
-        background: #3A7CA5;
+      .upBtn {
+        background: #EC7063;
       }
 
-      .big {
-        background: #9D4028;
+      .downBtn {
+        background: #2ECC71;
       }
 
       a {
@@ -119,8 +119,6 @@
     </style>
 
     <script>
-      const cancellinoId = 0;
-      const cancelloneId = 1;
       const ajaxTimeout  = 10;
       var myTimeout = undefined;
       var timeoutCtr = 0;
@@ -137,16 +135,17 @@
         }
       }
 
-      function asyncOpen(gateId) {
+      function upDown(up) {
         var xhttp = new XMLHttpRequest();
-        var htmlElemName = "res" + gateId;
+        var htmlElemName = "res" + (up ? "0" : "1");
 
         if (myTimeout !== undefined) {
           clearTimeout(myTimeout);
           myTimeout = undefined;
         }
 
-        document.getElementById(htmlElemName).innerHTML = "Apertura in Corso...";
+        var msg = "Going " + (up ? "up" : "down") + "...";
+        document.getElementById(htmlElemName).innerHTML = msg;
 
         timeoutCtr = 0;
         myTimeout = setTimeout(xhrTimeoutCB, 1000, htmlElemName);
@@ -157,7 +156,7 @@
             clearTimeout(myTimeout);
             myTimeout = undefined;
             if (this.status === 200 && this.responseText == "0") {
-              document.getElementById(htmlElemName).innerHTML = "Aperto";
+              document.getElementById(htmlElemName).innerHTML = "Finished";
               getJsonData();
             }
             else {
@@ -171,8 +170,8 @@
             }
           }
         };
-
-        xhttp.open("POST", "open?id=" + gateId, true);
+        var url = (up ? "/up" : "/down");
+        xhttp.open("POST", url, true);
         xhttp.send();
       }
 
@@ -200,8 +199,8 @@
             //currentState = data.currentState;
             fwUptime = data.fwUptime;
             fwVersion = data.fwVersion;
-            last = data.lastOpened.split(";");
-            ctr = data.openCtr.split(";");
+            last = data.lastOpened;
+            ctr = data.openCtr;
 
 
             document.getElementById("res0").innerHTML = "";
@@ -212,10 +211,10 @@
           document.getElementById("fwUptime").innerHTML = fwUptime;
           document.getElementById("fwVersion").innerHTML = fwVersion;
 
-          document.getElementById("last0").innerHTML = last[0];
-          document.getElementById("last1").innerHTML = last[1];
-          document.getElementById("ctr0").innerHTML = ctr[0];
-          document.getElementById("ctr1").innerHTML = ctr[1];
+          document.getElementById("last0").innerHTML = last
+          document.getElementById("last1").innerHTML = last;
+          document.getElementById("ctr0").innerHTML = ctr;
+          document.getElementById("ctr1").innerHTML = ctr;
 
           setTimeout(getJsonData, 30000);
         };
@@ -234,13 +233,11 @@
 
   <body>
     <div class="grid-container">
-
-      <div class="grid-item header">Apertura cancelli</div>
-
-      <div class="grid-item small">
-        <a href="javascript:asyncOpen(cancellinoId);">
+      <div class="grid-item header">Blind Control</div>
+      <div class="grid-item downBtn">
+        <a href="javascript:upDown(true);">
           <nav class="verticalFlex">
-            <div class="buttonTitle">Small</div>
+            <div class="buttonTitle">UP</div>
             <div id="res0" class="result">&nbsp;</div>
             <div class="info">
                 (last
@@ -252,10 +249,10 @@
         </a>
       </div>
 
-      <div class="grid-item big ">
-        <a href="javascript:asyncOpen(cancelloneId);">
+      <div class="grid-item upBtn">
+        <a href="javascript:upDown(false);">
           <nav class="verticalFlex">
-            <div class="buttonTitle"> Big </div>
+            <div class="buttonTitle">DOWN</div>
             <div id="res1" class="result">&nbsp;</div>
             <div class="info">
                 (last
