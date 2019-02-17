@@ -101,9 +101,9 @@ static void serveUpDown(void)
 
     int res = 0;
     if (uri == "/up") {
-        blindCtl.up();
+        res = blindCtl.up();
     } else if (uri == "/down") {
-        blindCtl.down();
+        res = blindCtl.down();
     } else {
         res = 1;
     }

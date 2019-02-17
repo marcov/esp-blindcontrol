@@ -26,25 +26,21 @@ static void  uptimeCtrCb(void) {
 
 void setup(void)
 {
-    blindCtl.init();
     digitalWrite(GPIO_LED,  HIGH);
     pinMode(GPIO_LED,       OUTPUT);
-    //pinMode(BTN_PIN, INPUT);
-
-    uptimeCtrTimer.attach_ms(1000, uptimeCtrCb);
-
-    Serial.begin(115200);
-
-    for (unsigned i = 0; i < 10; i++)
-    {
+    for (unsigned i = 0; i < 10; i++) {
         digitalWrite(GPIO_LED,  !digitalRead(GPIO_LED));
         delay(100);
     }
-
     digitalWrite(GPIO_LED,  HIGH);
 
-    Serial.print("....Started up!");
-    Serial.println("");
+    Serial.begin(115200);
+    Serial.println("....Started up!");
+
+    blindCtl.init();
+    //pinMode(BTN_PIN, INPUT);
+
+    uptimeCtrTimer.attach_ms(1000, uptimeCtrCb);
 
     wifiSetup(false, true, Credentials::wifiSsid, Credentials::wifiPasswd);
 
@@ -59,9 +55,6 @@ void setup(void)
 
 void loop(void)
 {
-    unsigned now;
-    now = millis();
-
     wdtKick();
 
     if (wifiHasConnected()) {
@@ -75,4 +68,5 @@ void loop(void)
     }
 
     webserverLoop();
+    blindCtl.loop();
 }
