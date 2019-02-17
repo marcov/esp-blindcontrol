@@ -16,121 +16,165 @@
 
     <style>
 
-     body {
-        font-family: "Segoe UI",Arial,sans-serif;
-        font-size: 200%;
-        background-color:  #2B303A;
-        color: white;
-        border: none;
-      }
+body {
+  font-family: "Segoe UI",Arial,sans-serif;
+  font-size: 200%;
+  background-color:  #2B303A;
+  color: white;
+  border: none;
+}
 
-      .grid-container {
-        /* background-color: red; */
-        height: 95vh;
-      }
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-      .grid-item {
-        margin: 0 auto;
-        text-align: center;
-        padding: 0.1em;
-        letter-spacing: 2px;
-        vertical-align: middle;
-        border-radius: 25px;
-        color: aliceblue;
-        display: block;
-        max-width: 500px;
-        margin-bottom: 0.3em;
-      }
+.grid-container {
+  height: 95vh;
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-      .header {
-        padding: 0.1em;
-        font-size: 90%;
-        font-weight: bold;
-      }
+.header {
+  font-weight: bold;
+  margin: 0 auto;
+  text-align: center;
+  letter-spacing: 2px;
+}
 
-      .downBtn, .upBtn {
-        height: 33vh;
-      }
+.upBox,
+.downBox,
+.topBox,
+.bottomBox,
+.infoBox {
+  margin: 0 auto;
+  margin-top: .5em;
+  text-align: center;
+  padding: 0;
+  border-radius: 15px;
+}
 
-      .upBtn {
-        background: #2ECC71;
-      }
+.upBox,
+.downBox,
+.topBox,
+.bottomBox {
+  margin-left: .1em;
+  margin-right: .1em;
+  height: 4em;
+  width: 50%;
+}
 
-      .downBtn {
-        background: #EC7063;
-      }
+.upBox:active, .downBox:active, .topBox:active, .bottomBox:active {
+  background: yellow;
+  letter-spacing: 1px;
+  transition: all 1s ease;
+}
 
-      a {
-        text-decoration: none; /* no underline */
-        color: aliceblue;
-        display: block;
-        height: 100%;
-      }
+.upBox {
+  background: #2ECC71;
+}
 
-      div.grid-item:active{
-        background: #3F1F17;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-      }
+.downBox {
+  background: #EC7063;
+}
 
-      #footerContainer {
-        right: 0;
-        bottom: 0;
-        position: absolute;
-        left: 0;
-        padding: 0.5rem;
-        margin: 0 auto;
-        margin-top: 1em;
-        text-align: center;
-        font-size: 40%;
-        max-width: 500px;
-      }
+.topBox {
+  background: #FCF3CF;
+}
+
+.bottomBox {
+  background: #808B96;
+}
+
+.topBox a, .bottomBox a {
+  color: #1C2833;
+}
 
 
-      .result {
-        font-size: 70%;
-        color: #EDF060;
-        font-weight: bold;
-      }
+.infoBox {
+  background: #003F91;
+  font-size: 50%;
+  text-align: left;
+}
 
-      .info {
-        background: #7FB3D5;
-        color: #F1FCF2;
-        padding-top: 1em;
-        padding-bottom: 1em;
-        font-size: 80%;
-      }
+a {
+  text-decoration: none; /* no underline */
+  color: aliceblue;
+  display: block;
+  height: 100%;
+}
 
-      .horizontalFlex {
-        display: flex;
-        justify-content: center;
-      }
+#footerContainer {
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  left: 0;
+  padding: 0.5rem;
+  margin: 0 auto;
+  margin-top: 1em;
+  text-align: center;
+  font-size: 40%;
+  max-width: 500px;
+}
 
-      .verticalFlex {
-        height: 100%;
-        display: flex;
-        flex-direction:column;
-        justify-content: center;
-      }
 
-      .buttonTitle {
-        font-size: 150%;
-        font-weight: bold;
-      }
+.result {
+  font-size: 70%;
+  color: #EDF060;
+  font-weight: bold;
+}
 
-      .slider {
-        -webkit-appearance: slider-vertical;
-        height: 90%;
-        margin-top: 2em;
-        margin-bottom: 2em;
-        width: 100%;
-      }
+
+.horizontalFlex {
+  display: flex;
+  justify-content: center;
+}
+
+.verticalFlex {
+  height: 100%;
+  display: flex;
+  flex-direction:column;
+  justify-content: center;
+}
+
+.buttonTitle {
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.flex-form {
+  padding-top: 0.2em;
+  padding-left: 1em;
+}
+
+.flex-form > li {
+  display: flex;
+  flex-flow: horizontal;
+  justify-content: flex-start;
+  margin-top: 0.5em;
+}
+
+.flex-form label {
+  width: 30%;
+  font-size: 90%;
+}
+
+.asyncResult {
+  color: #EDF060;
+}
     </style>
 
     <script>
       const ajaxTimeout  = 10;
       var myTimeout = undefined;
       var timeoutCtr = 0;
+
+      var goTop    = 0;
+      var goBottom = 1;
+      var goUp     = 2;
+      var goDown   = 3;
 
       function xhrTimeoutCB(htmlElemName) {
 
@@ -144,18 +188,40 @@
         }
       }
 
-      function upDown(up) {
+      function upDown(goTarget) {
         var xhttp = new XMLHttpRequest();
-        var htmlElemName = "res" + (up ? "0" : "1");
+        var htmlElemName = "goRes";
 
         if (myTimeout !== undefined) {
           clearTimeout(myTimeout);
           myTimeout = undefined;
         }
 
-        var msg = "Going " + (up ? "up" : "down") + "...";
-        document.getElementById(htmlElemName).innerHTML = msg;
+        var msg = "Going ";
+        var url;
+        switch (goTarget) {
+          case goTop:
+            msg = "TOP";
+            url = "/top";
+            break;
+          case goBottom:
+            msg = "BOTTOM";
+            url = "/bottom";
+            break;
+          case goUp:
+            msg = "UP";
+            url = "/up";
+            break;
+          case goDown:
+            msg = "DOWN";
+            url = "/down";
+            break;
 
+          default:
+            return -1;
+        }
+
+        document.getElementById(htmlElemName).innerHTML = msg;
         timeoutCtr = 0;
         myTimeout = setTimeout(xhrTimeoutCB, 1000, htmlElemName);
 
@@ -179,7 +245,6 @@
             }
           }
         };
-        var url = (up ? "/up" : "/down");
         xhttp.open("POST", url, true);
         xhttp.send();
       }
@@ -201,7 +266,7 @@
             try {
               var data = JSON.parse(this.responseText);
             } catch (e) {
-              document.getElementById("jsonRes").innerHTML = "Errore JSON";
+              document.getElementById("jsonRes").innerHTML = "ERR JSON";
               return;
             }
 
@@ -214,7 +279,7 @@
 
             document.getElementById("jsonRes").innerHTML = "";
           } else {
-            document.getElementById("jsonRes").innerHTML = "Errore lettura dati";
+            document.getElementById("jsonRes").innerHTML = "ERR async read";
           }
 
           document.getElementById("fwUptime").innerHTML = fwUptime;
@@ -240,54 +305,72 @@
 
   <body>
     <div class="grid-container">
-      <div class="grid-item header">Blind Control</div>
-
+      <div class="header">Blind Control</div>
 
       <nav class="horizontalFlex">
-        <div style="width: 90%;">
-          <div class="grid-item upBtn">
-            <a href="javascript:upDown(true);">
-              <nav class="verticalFlex">
-                <div class="buttonTitle">UP</div>
-                <div id="res0" class="result">&nbsp;</div>
-              </nav>
-            </a>
-          </div>
-
-          <div class="grid-item downBtn">
-            <a href="javascript:upDown(false);">
-              <nav class="verticalFlex">
-                <div class="buttonTitle">DOWN</div>
-                <div id="res1" class="result">&nbsp;</div>
-              </nav>
-            </a>
-          </div>
-          <div class="grid-item info">
-            <b>INFO</b> <i>last</i>
-            <span id="lastMoved">&nbsp;</span>
-            &nbsp;&nbsp;  <i>ctr</i>
-            <span id="moveCtr">&nbsp;</span>
-            <p style="font-size: 70%; padding: 0; margin: 0;" id="jsonRes">&nbsp;</p>
-          </div>
+        <div class="topBox">
+          <a href="javascript:upDown(goTop);">
+            <ul class="verticalFlex">
+              <li class="buttonTitle">TOP</li>
+            </ul>
+          </a>
         </div>
 
-        <div style="width: 10%;">
-          <input class="slider"
-          type="range"
-          min="0"
-          max="100"
-          step="10"
-          value="0"
-          orient="vertical">
+        <div class="bottomBox">
+          <a href="javascript:upDown(goBottom);">
+            <ul class="verticalFlex">
+              <li class="buttonTitle">BOTTOM</li>
+            </ul>
+          </a>
         </div>
       </nav>
 
+      <div class="infoBox">
+        <ul class="flex-form">
+          <li>
+            <label>Result</label>
+            <span id="goRes" class="result"></span>
+          </li>
+          <li>
+            <label>Last</label>
+            <span id="lastMoved"></span>
+          </li>
+          <li>
+            <label>#</label>
+            <span id="moveCtr"></span>
+          </li>
+          <li>
+            <label>Uptime</label>
+            <span id="fwUptime"></span>
+          </li>
+          <li>
+            <label>&nbsp;</label>
+            <span id="jsonRes" class="goRes">&nbsp;</span>
+          </li>
+        </ul>
+      </div>
+
+      <nav class="horizontalFlex">
+        <div class="upBox">
+          <a href="javascript:upDown(goUp);">
+            <ul class="verticalFlex">
+              <li class="buttonTitle">UP</li>
+            </ul>
+          </a>
+        </div>
+
+        <div class="downBox">
+          <a href="javascript:upDown(goDown);">
+            <ul class="verticalFlex">
+              <li class="buttonTitle">DOWN</li>
+            </ul>
+          </a>
+        </div>
+      </nav>
 
       <div id="footerContainer">
-        Up&nbsp;<span id="fwUptime"></span>
-        <br>
         <span id="fwVersion"></span> - <b>(C) 2018 Fa&amp;Desfa Fiobe</b> - 'Ntal pica mia l'sul
       </div>
-    </div>
+    </div> <!-- end grid-container -->
   </body>
 </html>

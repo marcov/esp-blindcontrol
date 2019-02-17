@@ -87,7 +87,7 @@ static void serveMainPage(void)
     pHttpServer->send_P(200, "text/html", (const char *)index_html, index_html_size);
 }
 
-static void serveUpDown(void)
+static void serveGoToPosition(void)
 {
     if (!is_authentified()){
         String header;
@@ -99,11 +99,21 @@ static void serveUpDown(void)
 
     String uri = pHttpServer->uri();
 
+    auto t = BlindControl::UPDOWN_MIN_T_SEC;
+
+    if (pHttpServer->hasArg("t")) {
+        t = (pHttpServer->arg("t").toInt());
+    }
+
     int res = 0;
-    if (uri == "/up") {
-        res = blindCtl.up();
+    if (uri == "/top") {
+        res = blindCtl.top();
+    } else if (uri == "/bottom") {
+        res = blindCtl.bottom();
+    } else if (uri == "/up") {
+        res = blindCtl.up(t);
     } else if (uri == "/down") {
-        res = blindCtl.down();
+        res = blindCtl.down(t);
     } else {
         res = 1;
     }
@@ -195,8 +205,10 @@ void webpagesInit(void)
     const ws_dynamic_page_t dyn_pages[] = {
         {"/",       serveMainPage},
         {"/reboot", serveReboot},
-        {"/up",     serveUpDown},
-        {"/down",   serveUpDown},
+        {"/up",     serveGoToPosition},
+        {"/down",   serveGoToPosition},
+        {"/top",    serveGoToPosition},
+        {"/bottom", serveGoToPosition},
         {"/login",  handleLogin},
         {"/logout", handleLogout},
         {"/jsonData",   serveJsonData},
