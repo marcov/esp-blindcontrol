@@ -4,9 +4,7 @@ OTA_BOARD := sonoff-dual
 OTA_FW    := .pioenvs/sonoff-dual/firmware.bin
 
 .PHONY: all
-all: $(OTA_FW)
-
-$(OTA_FW):
+all:
 	pio run
 
 .PHONY: clean
