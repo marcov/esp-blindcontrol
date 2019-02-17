@@ -53,11 +53,11 @@
       }
 
       .upBtn {
-        background: #EC7063;
+        background: #2ECC71;
       }
 
       .downBtn {
-        background: #2ECC71;
+        background: #EC7063;
       }
 
       a {
@@ -94,10 +94,11 @@
       }
 
       .info {
-        font-size: 50%;
+        background: #7FB3D5;
         color: #F1FCF2;
-        text-align: left;
-        margin: 0 auto;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        font-size: 80%;
       }
 
       .horizontalFlex {
@@ -115,6 +116,14 @@
       .buttonTitle {
         font-size: 150%;
         font-weight: bold;
+      }
+
+      .slider {
+        -webkit-appearance: slider-vertical;
+        height: 90%;
+        margin-top: 2em;
+        margin-bottom: 2em;
+        width: 100%;
       }
     </style>
 
@@ -192,29 +201,27 @@
             try {
               var data = JSON.parse(this.responseText);
             } catch (e) {
-              document.getElementById("res0").innerHTML = "Errore JSON";
+              document.getElementById("jsonRes").innerHTML = "Errore JSON";
               return;
             }
 
             //currentState = data.currentState;
             fwUptime = data.fwUptime;
             fwVersion = data.fwVersion;
-            last = data.lastOpened;
-            ctr = data.openCtr;
+            last = data.lastMoved;
+            ctr = data.moveCtr;
 
 
-            document.getElementById("res0").innerHTML = "";
+            document.getElementById("jsonRes").innerHTML = "";
           } else {
-            document.getElementById("res0").innerHTML = "Errore lettura dati";
+            document.getElementById("jsonRes").innerHTML = "Errore lettura dati";
           }
 
           document.getElementById("fwUptime").innerHTML = fwUptime;
           document.getElementById("fwVersion").innerHTML = fwVersion;
 
-          document.getElementById("last0").innerHTML = last
-          document.getElementById("last1").innerHTML = last;
-          document.getElementById("ctr0").innerHTML = ctr;
-          document.getElementById("ctr1").innerHTML = ctr;
+          document.getElementById("lastMoved").innerHTML = last
+          document.getElementById("moveCtr").innerHTML = ctr;
 
           setTimeout(getJsonData, 30000);
         };
@@ -234,35 +241,47 @@
   <body>
     <div class="grid-container">
       <div class="grid-item header">Blind Control</div>
-      <div class="grid-item downBtn">
-        <a href="javascript:upDown(true);">
-          <nav class="verticalFlex">
-            <div class="buttonTitle">UP</div>
-            <div id="res0" class="result">&nbsp;</div>
-            <div class="info">
-                (last
-                <span id="last0">&nbsp;</span>
-                &nbsp;&nbsp;  #
-                <span id="ctr0">&nbsp;</span>)
-            </div>
-          </nav>
-        </a>
-      </div>
 
-      <div class="grid-item upBtn">
-        <a href="javascript:upDown(false);">
-          <nav class="verticalFlex">
-            <div class="buttonTitle">DOWN</div>
-            <div id="res1" class="result">&nbsp;</div>
-            <div class="info">
-                (last
-                <span id="last1">&nbsp;</span>
-                &nbsp;&nbsp;  #
-                <span id="ctr1">&nbsp;</span>)
-            </div>
-          </nav>
-        </a>
-      </div>
+
+      <nav class="horizontalFlex">
+        <div style="width: 90%;">
+          <div class="grid-item upBtn">
+            <a href="javascript:upDown(true);">
+              <nav class="verticalFlex">
+                <div class="buttonTitle">UP</div>
+                <div id="res0" class="result">&nbsp;</div>
+              </nav>
+            </a>
+          </div>
+
+          <div class="grid-item downBtn">
+            <a href="javascript:upDown(false);">
+              <nav class="verticalFlex">
+                <div class="buttonTitle">DOWN</div>
+                <div id="res1" class="result">&nbsp;</div>
+              </nav>
+            </a>
+          </div>
+          <div class="grid-item info">
+            <b>INFO</b> <i>last</i>
+            <span id="lastMoved">&nbsp;</span>
+            &nbsp;&nbsp;  <i>ctr</i>
+            <span id="moveCtr">&nbsp;</span>
+            <p style="font-size: 70%; padding: 0; margin: 0;" id="jsonRes">&nbsp;</p>
+          </div>
+        </div>
+
+        <div style="width: 10%;">
+          <input class="slider"
+          type="range"
+          min="0"
+          max="100"
+          step="10"
+          value="0"
+          orient="vertical">
+        </div>
+      </nav>
+
 
       <div id="footerContainer">
         Up&nbsp;<span id="fwUptime"></span>
