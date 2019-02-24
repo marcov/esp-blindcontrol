@@ -73,7 +73,7 @@ public:
 
     void eeprom_defaults() {
 
-        for (auto i = 0; i < sizeof(EEPROM_START_TAG); i++) {
+        for (size_t i = 0; i < sizeof(EEPROM_START_TAG); i++) {
             EEPROM[i] = (EEPROM_START_TAG >> i) & 0xFF;
         }
 
@@ -94,7 +94,7 @@ private:
     };
 
     bool eeprom_valid() {
-        for (auto i = 0; i < sizeof(EEPROM_START_TAG); i++) {
+        for (size_t i = 0; i < sizeof(EEPROM_START_TAG); i++) {
             if (EEPROM[i] != ((EEPROM_START_TAG >> i) & 0xFF)) {
                 return false;
             }
