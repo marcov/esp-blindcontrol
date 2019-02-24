@@ -5,10 +5,15 @@
 #define GPIO_RL2    5
 #define GPIO_LED    13
 #define GPIO_SWITCH 10
+#define GPIO_BTN0   0
+#define GPIO_BTN1   9
 
 #define SERIAL_BAUDRATE 115200
 
-
+// TODO: these times may change over time, so it would be
+// nice to store them in EEPROM and have them customizable.
+#define BLIND_BOTTOM_2_TOP_MS 30700
+#define BLIND_TOP_2_BOTTOM_MS 29500
 
 #define EEPROM_SIZE             512
 #define EEPROM_START_ADDR       0
