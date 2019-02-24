@@ -1,7 +1,7 @@
 OTA_CMD   := ./esp-scripts/sh/otaupdate.sh
 OTA_IP    := 10.0.0.109
 OTA_BOARD := sonoff-dual
-OTA_FW    := .pioenvs/sonoff-dual/firmware.bin
+OTA_FW    := .pioenvs/$(OTA_BOARD)/firmware.bin
 
 .PHONY: all
 all:
