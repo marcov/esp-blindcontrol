@@ -28,7 +28,8 @@ private:
 
     void relayPulse(relay_t pin, unsigned long timeMs)
     {
-        if ((digitalRead(RELAY_UP) != IDLE_POLARITY) ||
+        if ((activeRelay != RELAY_NONE) ||
+            (digitalRead(RELAY_UP) != IDLE_POLARITY) ||
             (digitalRead(RELAY_DOWN) != IDLE_POLARITY)) {
             return;
         }
@@ -43,11 +44,10 @@ public:
     unsigned uptime;
     unsigned lastMoved;
     unsigned moveCtr;
-    static constexpr int UPDOWN_MIN_T_SEC      = 1;
-    static constexpr int TOP_T_SEC             = 10;
-    static constexpr int BOTTOM_T_SEC          = 10;
-    static constexpr int UPDOWN_MAX_T_SEC      = max(TOP_T_SEC, BOTTOM_T_SEC);
-
+    static constexpr unsigned TOP_T_MS        = BLIND_BOTTOM_2_TOP_MS;
+    static constexpr unsigned BOTTOM_T_MS     = BLIND_TOP_2_BOTTOM_MS;
+    static constexpr unsigned UPDOWN_MIN_T_MS = 1 * 1000;
+    static constexpr unsigned UPDOWN_MAX_T_MS = (TOP_T_MS >= BOTTOM_T_MS) ? TOP_T_MS : BOTTOM_T_MS;
 
     void moveCallback(void) {
         Serial.println("end move");
@@ -71,36 +71,36 @@ public:
         pinMode(GPIO_RL2, OUTPUT);
     }
 
-    int up(unsigned t) {
-        if (t < UPDOWN_MIN_T_SEC || t > UPDOWN_MAX_T_SEC) {
-            t = UPDOWN_MIN_T_SEC;
+    int up(unsigned ms) {
+        if (ms < UPDOWN_MIN_T_MS || ms > UPDOWN_MAX_T_MS) {
+            ms = UPDOWN_MIN_T_MS;
         }
         Serial.println("going up");
         if (activeRelay != RELAY_NONE) {
             return -1;
         }
-        relayPulse(RELAY_UP, t * 1000);
+        relayPulse(RELAY_UP, ms);
         return 0;
     }
 
-    int down(unsigned t) {
-        if (t < UPDOWN_MIN_T_SEC || t > UPDOWN_MAX_T_SEC) {
-            t = UPDOWN_MIN_T_SEC;
+    int down(unsigned ms) {
+        if (ms < UPDOWN_MIN_T_MS || ms > UPDOWN_MAX_T_MS) {
+            ms = UPDOWN_MIN_T_MS;
         }
         Serial.println("going down");
         if (activeRelay != RELAY_NONE) {
             return -1;
         }
-        relayPulse(RELAY_DOWN, t * 1000);
+        relayPulse(RELAY_DOWN, ms);
         return 0;
     }
 
     int top() {
-        return up(TOP_T_SEC);
+        return up(TOP_T_MS);
     }
 
     int bottom() {
-        return down(BOTTOM_T_SEC);
+        return down(BOTTOM_T_MS);
     }
 
     void loop() {

@@ -99,10 +99,10 @@ static void serveGoToPosition(void)
 
     String uri = pHttpServer->uri();
 
-    auto t = BlindControl::UPDOWN_MIN_T_SEC;
+    auto tMs = BlindControl::UPDOWN_MIN_T_MS;
 
     if (pHttpServer->hasArg("t")) {
-        t = (pHttpServer->arg("t").toInt());
+        tMs = (pHttpServer->arg("t").toInt()) * 1000;
     }
 
     int res = 0;
@@ -111,9 +111,9 @@ static void serveGoToPosition(void)
     } else if (uri == "/bottom") {
         res = blindCtl.bottom();
     } else if (uri == "/up") {
-        res = blindCtl.up(t);
+        res = blindCtl.up(tMs);
     } else if (uri == "/down") {
-        res = blindCtl.down(t);
+        res = blindCtl.down(tMs);
     } else {
         res = 1;
     }

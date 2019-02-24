@@ -70,8 +70,8 @@ static void button_check()
             lastChangeTs = millis();
 
             if (!blindCtl.moving()) {
-                if (nextUp) blindCtl.up(BlindControl::UPDOWN_MIN_T_SEC);
-                else        blindCtl.down(BlindControl::UPDOWN_MIN_T_SEC);
+                if (nextUp) blindCtl.up(BlindControl::UPDOWN_MIN_T_MS);
+                else        blindCtl.down(BlindControl::UPDOWN_MIN_T_MS);
                 nextUp = !nextUp;
             }
 

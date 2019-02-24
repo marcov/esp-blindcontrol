@@ -21,8 +21,11 @@
 #define EEPROM_CTRL_CFG_START   8
 
 
-#define FW_VERSION          "1.0"
+#define FW_VERSION          "1.1"
 // Changelog:
+// 1.1
+// - Use ms timings instead of s
+// - Calibrate top/bottom based on actual blind travel time
 // 1.0
 // - Initial release
 
