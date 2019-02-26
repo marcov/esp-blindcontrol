@@ -8,3 +8,5 @@
 /src/chtml/*.h
 /src/credentials.cc
 /html/jsonData
+/.ycm_extra_conf.py
+/compile_commands.json
