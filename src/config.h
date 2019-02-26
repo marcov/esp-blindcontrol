@@ -21,8 +21,10 @@
 #define EEPROM_CTRL_CFG_START   8
 
 
-#define FW_VERSION          "1.1"
+#define FW_VERSION          "1.2"
 // Changelog:
+// 1.2
+// - Show last opened in hh:mm:ss format
 // 1.1
 // - Use ms timings instead of s
 // - Calibrate top/bottom based on actual blind travel time

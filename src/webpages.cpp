@@ -186,10 +186,8 @@ static void serveJsonData(void)
 
     root["fwUptime"]  =  secondsToTime(blindCtl.uptime, false);
     root["fwVersion"] = "v" FW_VERSION " " __DATE__;
-
-    root["lastMoved"] = String(blindCtl.lastMoved);
-
-    root["moveCtr"] = String(blindCtl.moveCtr);
+    root["lastMoved"] = secondsToTime(blindCtl.lastMoved, false);
+    root["moveCtr"]   = String(blindCtl.moveCtr);
 
     String msg;
     root.printTo(msg);
