@@ -21,8 +21,10 @@
 #define EEPROM_CTRL_CFG_START   8
 
 
-#define FW_VERSION          "1.2"
+#define FW_VERSION          "1.3"
 // Changelog:
+// 1.3
+// - Add "STOP" button
 // 1.2
 // - Show last opened in hh:mm:ss format
 // 1.1
