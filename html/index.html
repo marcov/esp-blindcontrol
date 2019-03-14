@@ -44,40 +44,36 @@ li {
   letter-spacing: 2px;
 }
 
-.upBox,
-.downBox,
-.topBox,
-.bottomBox,
-.infoBox {
+.boxed{
   margin: 0 auto;
-  margin-top: .5em;
   text-align: center;
   padding: 0;
   border-radius: 15px;
 }
 
-.upBox,
-.downBox,
-.topBox,
-.bottomBox {
+.buttonBox {
   margin-left: .1em;
   margin-right: .1em;
   height: 4em;
   width: 50%;
 }
 
-.upBox:active, .downBox:active, .topBox:active, .bottomBox:active {
-  background: yellow;
+.buttonBox:active {
+  background: white;
   letter-spacing: 1px;
   transition: all 1s ease;
 }
 
 .upBox {
-  background: #2ECC71;
+  background: #F4D03F;
+}
+
+.stopBox {
+  background: #E74C3C;
 }
 
 .downBox {
-  background: #EC7063;
+  background: #2874A6;
 }
 
 .topBox {
@@ -88,13 +84,15 @@ li {
   background: #808B96;
 }
 
-.topBox a, .bottomBox a {
-  color: #1C2833;
+.buttonBox a {
+  color: #273746;
 }
 
 
 .infoBox {
-  background: #003F91;
+  margin-top: .5em;
+  margin-bottom: .5em;
+  background: #17202A;
   font-size: 50%;
   text-align: left;
 }
@@ -171,13 +169,7 @@ a {
       var myTimeout = undefined;
       var timeoutCtr = 0;
 
-      var goTop    = 0;
-      var goBottom = 1;
-      var goUp     = 2;
-      var goDown   = 3;
-
       function xhrTimeoutCB(htmlElemName) {
-
         myTimeout = undefined;
 
         if (timeoutCtr++ >= ajaxTimeout) {
@@ -188,7 +180,7 @@ a {
         }
       }
 
-      function upDown(goTarget) {
+      function xhrHandler(action) {
         var xhttp = new XMLHttpRequest();
         var htmlElemName = "goRes";
 
@@ -199,22 +191,26 @@ a {
 
         var msg = "Going ";
         var url;
-        switch (goTarget) {
-          case goTop:
-            msg = "TOP";
+        switch (action) {
+          case "top":
+            msg += "TOP";
             url = "/top";
             break;
-          case goBottom:
-            msg = "BOTTOM";
+          case "bottom":
+            msg += "BOTTOM";
             url = "/bottom";
             break;
-          case goUp:
-            msg = "UP";
+          case "up":
+            msg += "UP";
             url = "/up";
             break;
-          case goDown:
-            msg = "DOWN";
+          case "down":
+            msg += "DOWN";
             url = "/down";
+            break;
+          case "stop":
+            msg = "STOP";
+            url = "/stop";
             break;
 
           default:
@@ -308,16 +304,16 @@ a {
       <div class="header">Blind Control</div>
 
       <nav class="horizontalFlex">
-        <div class="topBox">
-          <a href="javascript:upDown(goTop);">
+        <div class="boxed buttonBox topBox">
+          <a href="javascript:xhrHandler('top');">
             <ul class="verticalFlex">
               <li class="buttonTitle">TOP</li>
             </ul>
           </a>
         </div>
 
-        <div class="bottomBox">
-          <a href="javascript:upDown(goBottom);">
+        <div class="boxed buttonBox bottomBox">
+          <a href="javascript:xhrHandler('bottom');">
             <ul class="verticalFlex">
               <li class="buttonTitle">BOTTOM</li>
             </ul>
@@ -325,7 +321,7 @@ a {
         </div>
       </nav>
 
-      <div class="infoBox">
+      <div class="boxed infoBox">
         <ul class="flex-form">
           <li>
             <label>Result</label>
@@ -351,16 +347,24 @@ a {
       </div>
 
       <nav class="horizontalFlex">
-        <div class="upBox">
-          <a href="javascript:upDown(goUp);">
+        <div class="boxed buttonBox upBox">
+          <a href="javascript:xhrHandler('up');">
             <ul class="verticalFlex">
               <li class="buttonTitle">UP</li>
             </ul>
           </a>
         </div>
 
-        <div class="downBox">
-          <a href="javascript:upDown(goDown);">
+        <div class="boxed buttonBox stopBox">
+          <a href="javascript:xhrHandler('stop');">
+            <ul class="verticalFlex">
+              <li class="buttonTitle">STOP</li>
+            </ul>
+          </a>
+        </div>
+
+        <div class="boxed buttonBox downBox">
+          <a href="javascript:xhrHandler('down');">
             <ul class="verticalFlex">
               <li class="buttonTitle">DOWN</li>
             </ul>

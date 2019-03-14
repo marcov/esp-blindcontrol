@@ -22,11 +22,12 @@ private:
         IDLE_POLARITY = LOW,
     };
     Timer moveTimer;
+    int   tId;
     relay_t activeRelay;
 
     unsigned nextPos;
 
-    void relayPulse(relay_t pin, unsigned long timeMs)
+    void startMoving(relay_t pin, unsigned long timeMs)
     {
         if ((activeRelay != RELAY_NONE) ||
             (digitalRead(RELAY_UP) != IDLE_POLARITY) ||
@@ -37,8 +38,17 @@ private:
         digitalWrite(pin, MOVE_POLARITY);
         activeRelay = pin;
 
-        moveTimer.after(timeMs, timerCallback);
+        tId = moveTimer.after(timeMs, timerCallback);
     }
+
+    void stopMoving(void) {
+        Serial.println("end move");
+        digitalWrite(activeRelay, IDLE_POLARITY);
+        activeRelay = RELAY_NONE;
+        moveCtr++;
+        lastMoved = 0;
+    }
+
 
 public:
     unsigned uptime;
@@ -48,14 +58,6 @@ public:
     static constexpr unsigned BOTTOM_T_MS     = BLIND_TOP_2_BOTTOM_MS;
     static constexpr unsigned UPDOWN_MIN_T_MS = 1 * 1000;
     static constexpr unsigned UPDOWN_MAX_T_MS = (TOP_T_MS >= BOTTOM_T_MS) ? TOP_T_MS : BOTTOM_T_MS;
-
-    void moveCallback(void) {
-        Serial.println("end move");
-        digitalWrite(activeRelay, IDLE_POLARITY);
-        activeRelay = RELAY_NONE;
-        moveCtr++;
-        lastMoved = 0;
-    }
 
     void updateCounters() {
         uptime++;
@@ -69,6 +71,7 @@ public:
 
         pinMode(GPIO_RL1, OUTPUT);
         pinMode(GPIO_RL2, OUTPUT);
+        tId = -1;
     }
 
     int up(unsigned ms) {
@@ -79,7 +82,7 @@ public:
         if (activeRelay != RELAY_NONE) {
             return -1;
         }
-        relayPulse(RELAY_UP, ms);
+        startMoving(RELAY_UP, ms);
         return 0;
     }
 
@@ -91,7 +94,7 @@ public:
         if (activeRelay != RELAY_NONE) {
             return -1;
         }
-        relayPulse(RELAY_DOWN, ms);
+        startMoving(RELAY_DOWN, ms);
         return 0;
     }
 
@@ -110,12 +113,26 @@ public:
     bool moving() {
         return (activeRelay != RELAY_NONE);
     }
+
+    int stop(bool timerCallback) {
+        if (!timerCallback &&  tId != -1) {
+            moveTimer.stop(tId);
+        }
+
+        tId = -1;
+
+        if (timerCallback || moving()) {
+            stopMoving();
+        }
+
+        return 0;
+    }
 };
 
 extern BlindControl blindCtl;
 
 static inline void timerCallback(void) {
-    blindCtl.moveCallback();
+    blindCtl.stop(true);
 }
 
 

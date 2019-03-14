@@ -18,7 +18,7 @@ extern "C" {
 static ESP8266WebServer  *pHttpServer;
 
 //Check if header is present and correct
-static bool is_authentified(){
+static bool isAuthenticated(){
     if (pHttpServer->hasHeader("Cookie")) {
         Serial.print("Found cookie: ");
         String cookie = pHttpServer->header("Cookie");
@@ -33,13 +33,17 @@ static bool is_authentified(){
     return false;
 }
 
+static void httpRedirect(const char *path) {
+    pHttpServer->sendHeader("Location", path);
+    pHttpServer->sendHeader("Cache-Control","no-cache");
+    pHttpServer->send(301);
+}
+
 static void handleLogout(void)
 {
     Serial.println("Disconnection");
-    pHttpServer->sendHeader("Location","/login");
-    pHttpServer->sendHeader("Cache-Control","no-cache");
     pHttpServer->sendHeader("Set-Cookie", "espSessionId=0; expires=Thu, 01 Jan 1970 00:00:00 GMT");
-    pHttpServer->send(301);
+    httpRedirect("/login");
     return;
 }
 
@@ -77,23 +81,17 @@ static void handleLogin(){
 
 static void serveMainPage(void)
 {
-    if (!is_authentified()){
-        String header;
-        pHttpServer->sendHeader("Location","/login");
-        pHttpServer->sendHeader("Cache-Control","no-cache");
-        pHttpServer->send(301);
+    if (!isAuthenticated()){
+        httpRedirect("/login");
         return;
     }
     pHttpServer->send_P(200, "text/html", (const char *)index_html, index_html_size);
 }
 
-static void serveGoToPosition(void)
+static void serveAction(void)
 {
-    if (!is_authentified()){
-        String header;
-        pHttpServer->sendHeader("Location","/login");
-        pHttpServer->sendHeader("Cache-Control","no-cache");
-        pHttpServer->send(301);
+    if (!isAuthenticated()){
+        httpRedirect("/login");
         return;
     }
 
@@ -114,6 +112,8 @@ static void serveGoToPosition(void)
         res = blindCtl.up(tMs);
     } else if (uri == "/down") {
         res = blindCtl.down(tMs);
+    } else if (uri == "/stop") {
+        res = blindCtl.stop(false);
     } else {
         res = 1;
     }
@@ -123,11 +123,8 @@ static void serveGoToPosition(void)
 
 static void serveReboot(void)
 {
-    if (!is_authentified()){
-        String header;
-        pHttpServer->sendHeader("Location","/login");
-        pHttpServer->sendHeader("Cache-Control","no-cache");
-        pHttpServer->send(301);
+    if (!isAuthenticated()){
+        httpRedirect("/login");
         return;
     }
     pHttpServer->send(200, "text/plain", "Rebooting...");
@@ -203,10 +200,11 @@ void webpagesInit(void)
     const ws_dynamic_page_t dyn_pages[] = {
         {"/",       serveMainPage},
         {"/reboot", serveReboot},
-        {"/up",     serveGoToPosition},
-        {"/down",   serveGoToPosition},
-        {"/top",    serveGoToPosition},
-        {"/bottom", serveGoToPosition},
+        {"/up",     serveAction},
+        {"/down",   serveAction},
+        {"/top",    serveAction},
+        {"/bottom", serveAction},
+        {"/stop",   serveAction},
         {"/login",  handleLogin},
         {"/logout", handleLogout},
         {"/jsonData",   serveJsonData},
