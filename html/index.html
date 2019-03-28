@@ -226,8 +226,20 @@ a {
           if (this.readyState === 4) {
             clearTimeout(myTimeout);
             myTimeout = undefined;
-            if (this.status === 200 && this.responseText == "0") {
-              document.getElementById(htmlElemName).innerHTML = "Finished";
+            if (this.status === 200 && parseInt(this.responseText) >= 0) {
+              switch (parseInt(this.responseText)) {
+                case 0:
+                  document.getElementById(htmlElemName).innerHTML = "Done";
+                  break;
+
+                case 1:
+                  document.getElementById(htmlElemName).innerHTML = "Repeating";
+                  break;
+
+                case 1:
+                  document.getElementById(htmlElemName).innerHTML = "UNK";
+                  break;
+              }
               getJsonData();
             }
             else {

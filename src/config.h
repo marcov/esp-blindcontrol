@@ -21,8 +21,12 @@
 #define EEPROM_CTRL_CFG_START   8
 
 
-#define FW_VERSION          "1.3"
+#define FW_VERSION          "1.4"
 // Changelog:
+// 1.4
+// - Fix html pages title
+// - Add repeat function to UP and DOWN buttons, to repeat going up or
+// down
 // 1.3
 // - Add "STOP" button
 // 1.2
