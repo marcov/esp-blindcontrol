@@ -178,16 +178,15 @@ static String secondsToTime(unsigned s, bool addSeconds) {
 
 static void serveJsonData(void)
 {
-    StaticJsonBuffer<512> jsonBuffer;
-    ArduinoJson::JsonObject& root = jsonBuffer.createObject();
+    ArduinoJson::StaticJsonDocument<512> jsonDoc;
 
-    root["fwUptime"]  =  secondsToTime(blindCtl.uptime, false);
-    root["fwVersion"] = "v" FW_VERSION " " __DATE__;
-    root["lastMoved"] = secondsToTime(blindCtl.lastMoved, false);
-    root["moveCtr"]   = String(blindCtl.moveCtr);
+    jsonDoc["fwUptime"]  =  secondsToTime(blindCtl.uptime, false);
+    jsonDoc["fwVersion"] = "v" FW_VERSION " " __DATE__;
+    jsonDoc["lastMoved"] = secondsToTime(blindCtl.lastMoved, false);
+    jsonDoc["moveCtr"]   = String(blindCtl.moveCtr);
 
     String msg;
-    root.printTo(msg);
+    serializeJson(jsonDoc, msg);
     pHttpServer->send(200, "text/json", msg);
 }
 
