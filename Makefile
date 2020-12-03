@@ -1,16 +1,11 @@
-OTA_CMD   := ./esp-scripts/sh/otaupdate.sh
+ENV := sonoff-dual
 OTA_HOSTNAME := blind.lan
-OTA_BOARD := sonoff-dual
-OTA_FW    := .pio/build/$(OTA_BOARD)/firmware.bin
+TOPLEVEL_SOURCE_DIRS := \
+	src \
+	include \
+	lib \
+	esp-scripts \
+	pio \
+	.pio \
 
-.PHONY: all
-all:
-	pio run
-
-.PHONY: clean
-clean:
-	pio run --target clean
-
-.PHONY: ota
-ota: $(OTA_FW)
-	$(OTA_CMD) $(OTA_HOSTNAME) $<
+-include esp-scripts/main.mk

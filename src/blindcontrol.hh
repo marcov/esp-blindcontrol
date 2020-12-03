@@ -1,8 +1,8 @@
-#ifndef __BLINDCONTROL_HH__
-#define __BLINDCONTROL_HH__
+#pragma once
 
 #include "config.h"
 #include <Timer.h>
+#include <Arduino.h>
 
 #define max(A,B)  ((A) >= (B) ? (A) : (B))
 
@@ -78,7 +78,6 @@ private:
         return 0;
     }
 
-
 public:
     unsigned uptime;
     unsigned lastMoved;
@@ -151,6 +150,3 @@ extern BlindControl blindCtl;
 static inline void timerCallback(void) {
     blindCtl.stop(true);
 }
-
-
-#endif /* #ifndef __BLINDCONTROL_HH__ */

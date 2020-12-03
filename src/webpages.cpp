@@ -29,7 +29,7 @@ static bool isAuthenticated(){
         }
     }
 
-    Serial.println("Authentification Failed (cookie not found)");
+    Serial.println("Auth Failed (cookie not found)");
     return false;
 }
 
