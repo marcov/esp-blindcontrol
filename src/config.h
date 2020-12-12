@@ -3,7 +3,13 @@
 
 #define GPIO_RL1    12
 #define GPIO_RL2    5
-#define GPIO_LED    13
+#if defined(BOARD_SONOFF_DUAL)
+#  define GPIO_LED    13
+#elif defined(BOARD_D1_MINI)
+#  define GPIO_LED    2
+#else
+#  error No board defined or board not supported
+#endif
 #define GPIO_SWITCH 10
 #define GPIO_BTN0   0
 #define GPIO_BTN1   9
@@ -20,9 +26,10 @@
 #define EEPROM_START_TAG        0xCAFEBABE
 #define EEPROM_CTRL_CFG_START   8
 
-
-#define FW_VERSION          "1.4"
+#define FW_VERSION          "1.5"
 // Changelog:
+// 1.5
+// - New WIFI management
 // 1.4
 // - Fix html pages title
 // - Add repeat function to UP and DOWN buttons, to repeat going up or

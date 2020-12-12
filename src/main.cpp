@@ -1,6 +1,6 @@
 /*
- Gates Control
-*/
+   Gates Control
+   */
 #include <pgmspace.h>
 #include <Ticker.h>
 #include "config.h"
@@ -16,20 +16,54 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 BlindControl blindCtl;
-Ticker uptimeCtrTimer;
+static constexpr unsigned int k_MaxConnectTime = 1000UL;
+WIFI* g_WIFI;
+static Ticker uptimeCtrTimer;
 NVConfig  nvConfig;
 
 /******************************************************************************/
 
-static void  uptimeCtrCb(void) {
+static
+void
+uptimeCtrCb (
+    void
+    )
+{
     blindCtl.updateCounters();
 }
 
+static
+void
+ConnectedCallback (
+    void
+    )
+{
+    unsigned int originalState;
 
-void setup(void)
+    originalState = digitalRead(GPIO_LED);
+
+    for (int i = 0; i < 4; i++)
+    {
+        //
+        // Flash led to say we have just connected.
+        //
+        digitalWrite(GPIO_LED, (i % 2) ? originalState : !originalState);
+        delay(100);
+    }
+
+    digitalWrite(GPIO_LED, originalState);
+}
+
+void setup (
+    void
+    )
 {
     blindCtl.init();
+    g_WIFI = new WIFI(false, true, Credentials::wifiSsid,Credentials::wifiPasswd, k_MaxConnectTime);
 
+    //
+    // Signal we are up!
+    //
     digitalWrite(GPIO_LED,  HIGH);
     pinMode(GPIO_LED,       OUTPUT);
     for (unsigned i = 0; i < 10; i++) {
@@ -41,11 +75,15 @@ void setup(void)
     pinMode(GPIO_SWITCH, INPUT);
 
     Serial.begin(SERIAL_BAUDRATE);
-    Serial.println("....starting up");
+    Serial.println("...starting up");
 
-    uptimeCtrTimer.attach_ms(1000, uptimeCtrCb);
+    uptimeCtrTimer.attach_ms(1000, static_cast<Ticker::callback_function_t>(uptimeCtrCb));
 
-    wifiSetup(false, true, Credentials::wifiSsid, Credentials::wifiPasswd);
+    g_WIFI->Connect(5000);
+    if (g_WIFI->IsConnected())
+    {
+        ConnectedCallback();
+    }
 
     webpagesInit();
 
@@ -55,56 +93,71 @@ void setup(void)
     Serial.println("setup done");
 }
 
-static void button_check()
+static void button_check (
+    void
+    )
 {
+    typedef enum ButtonState
+    {
+        ButtonPressed = 0,
+        ButtonReleased = 1,
+    } ButtonState;
+
     constexpr int reset_counter_val = 6;
-    static int prevValue = 1;
+    static ButtonState cachedButtonState = ButtonReleased;
     static int lastChangeTs;
     static int resetCtr = 0;
     static bool nextUp;
-    int curValue = digitalRead(GPIO_SWITCH);
+    ButtonState currentButtonState;
 
-    if (millis() - lastChangeTs >= 1000) {
+    currentButtonState = static_cast<ButtonState>(digitalRead(GPIO_SWITCH));
 
-        if (prevValue == 1 && curValue == 0) {
-            lastChangeTs = millis();
-
-            if (!blindCtl.moving()) {
-                if (nextUp) blindCtl.up(BlindControl::UPDOWN_MIN_T_MS);
-                else        blindCtl.down(BlindControl::UPDOWN_MIN_T_MS);
-                nextUp = !nextUp;
-            }
-
-        } else if (prevValue == 0 && curValue == 0) {
-            lastChangeTs = millis();
-            digitalWrite(GPIO_LED,  !digitalRead(GPIO_LED));
-            if (resetCtr++ >= reset_counter_val) {
-                //nvConfig.eeprom_defaults();
-                ESP.restart();  // normal reboot
-            }
-
-        } else if (resetCtr > 0) {
-            resetCtr = 0;
-            digitalWrite(GPIO_LED, HIGH);
-        }
+    //
+    // Only check every 1s
+    //
+    if (millis() - lastChangeTs < 1000)
+    {
+        goto Exit;
     }
 
-    prevValue = curValue;
+    if (cachedButtonState == ButtonReleased && currentButtonState == ButtonPressed)
+    {
+        lastChangeTs = millis();
+
+        if (!blindCtl.moving())
+        {
+            if (nextUp) blindCtl.up(BlindControl::UPDOWN_MIN_T_MS);
+            else        blindCtl.down(BlindControl::UPDOWN_MIN_T_MS);
+            nextUp = !nextUp;
+        }
+    }
+    else if (cachedButtonState == ButtonPressed && currentButtonState == ButtonPressed)
+    {
+        lastChangeTs = millis();
+        digitalWrite(GPIO_LED,  !digitalRead(GPIO_LED));
+        if (resetCtr++ >= reset_counter_val)
+        {
+            //nvConfig.eeprom_defaults();
+            ESP.restart();  // normal reboot
+        }
+    }
+    else if (resetCtr > 0)
+    {
+        resetCtr = 0;
+        digitalWrite(GPIO_LED, HIGH);
+    }
+
+Exit:
+    cachedButtonState = currentButtonState;
 }
 
-void loop(void)
+void loop (
+    void
+    )
 {
     wdtKick();
 
-    if (wifiHasConnected()) {
-        // flash led to say we have just connected...?
-
-        unsigned prev_state = digitalRead(GPIO_LED);
-
-        digitalWrite(GPIO_LED, !prev_state);
-        delay(100);
-        digitalWrite(GPIO_LED, prev_state);
-    }
+    g_WIFI->Loop(ConnectedCallback);
 
     button_check();
     webserverLoop();
